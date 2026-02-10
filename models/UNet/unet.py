@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from blocks.encoder import Encoder
+from models.UNet.blocks.conv_relu import ConvReLU
 from blocks.decoder import Decoder
 from blocks.bottleneck import BottleNeck
 
