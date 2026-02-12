@@ -10,8 +10,6 @@ class MRI_Dataset(Dataset):
 
     def __init__(self, in_features: torch.Tensor, out_features: torch.Tensor) -> None:
 
-        super().__init__()
-
         self.in_features = in_features
         self.out_features = out_features
 
