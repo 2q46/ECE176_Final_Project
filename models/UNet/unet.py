@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.UNet.blocks.conv_relu import ConvReLU
-from blocks.decoder import Decoder
-from blocks.bottleneck import BottleNeck
+from blocks.conv_relu import ConvReLU
+from blocks.upsample_conv import UpsampleConv
+
 
 from params import UNetParams
 

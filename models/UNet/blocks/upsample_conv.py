@@ -4,14 +4,13 @@ import torch.nn.functional as F
 
 from params import UNetParams
 
-class BottleNeck(nn.Module):
+class UpsampleConv(nn.Module):
 
     def __init__(self, params : UNetParams):
         
-        super().__init__(BottleNeck, self)
+        super().__init__(UpsampleConv, self)
 
-        self.cache = []
 
-    def forward(self, x):
+    def forward(self, x, skip_conntection):
 
         pass

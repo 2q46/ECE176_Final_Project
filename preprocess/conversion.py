@@ -3,9 +3,12 @@ import glob
 import random
 import nibabel as nib
 import numpy as np
+
+import torch
+import torch.nn.functional as F 
+
 from nilearn import plotting
 from typing import Optional
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 train_data_path = "data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
@@ -17,6 +20,13 @@ def visualise_scan_data(data_path : Optional[str], is_train : bool, title="3D Sc
 
     plotting.plot_img(img=root_path + data_path, title=title)
     plotting.show()
+
+def to_one_hot(array : np.ndarray, num_classes : int) -> np.ndarray:
+
+    tensor = torch.tensor(array, dtype=torch.int64)
+    one_hot_tensor = F.one_hot(tensor, num_classes=num_classes)
+
+    return np.array(one_hot_tensor).astype(np.uint8)
 
 def visualise_datapoint(dir_path: Optional[str], is_train : bool, title="3D Scan")-> None:
     '''
@@ -53,6 +63,10 @@ def convert_all_npy(storage_location="data/BraTS2020_npy", cropping=True):
         mask_img = nib.load(mask).get_fdata().astype(np.uint8)
         mask_img[mask_img==4] = 3
 
+        # one-hot encoding each of the segmentation labels
+
+        mask_img = to_one_hot(mask_img, 4) # 0 1 2 and 3
+
         combined_img = np.stack([t1ce_img, t2_img, flair_img], axis=3)
         
         if cropping:
@@ -60,10 +74,16 @@ def convert_all_npy(storage_location="data/BraTS2020_npy", cropping=True):
             combined_img = combined_img[56:184, 56:184, 13:141]
             mask_img = mask_img[56:184, 56:184, 13:141]
 
-
         out_dir = os.path.join(storage_location, "data", str(idx))
         os.makedirs(out_dir, exist_ok=True)
+        
         np.save(f"{storage_location}/data/{idx}/combined_scan.npy", combined_img)
         np.save(f"{storage_location}/data/{idx}/mask.npy", mask_img)
+
+        saved_mask = np.load(f"{storage_location}/data/{idx}/mask.npy")
+        saved_combined = np.load(f"{storage_location}/data/{idx}/combined_scan.npy")
+
+        assert saved_combined.all() == combined_img.all(), "Saved combined img incorrectly"
+        assert saved_mask.all() == mask_img.all(), "Saved mask img incorrectly"
 
     print("Saving completed.")
