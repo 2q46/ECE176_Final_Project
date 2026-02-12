@@ -1,6 +1,5 @@
 import os
 import glob
-import random
 import nibabel as nib
 import numpy as np
 
