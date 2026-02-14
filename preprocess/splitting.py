@@ -25,7 +25,7 @@ def combine_from_npy(data_path: str = "data/BraTS2020_npy/data") -> tuple:
 
     return (features, labels)
 
-def train_test_split(features, labels) -> tuple:
+def train_test_split(features, labels, device) -> tuple:
 
     with open(file="config.json", encoding="utf-8", mode="r") as file:
         
@@ -40,7 +40,7 @@ def train_test_split(features, labels) -> tuple:
     labels = torch.tensor(labels, dtype=torch.float32)
     features = torch.tensor(features, dtype=torch.float32)
 
-    dataset = MRI_Dataset(features, labels)
+    dataset = MRI_Dataset(features, labels, device)
 
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     del dataset # save memory

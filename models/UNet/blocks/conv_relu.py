@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from params import UNetParams
+from models.UNet.params import UNetParams
 
 class ConvReLUBlock(nn.Module):
 
@@ -19,23 +19,25 @@ class ConvReLUBlock(nn.Module):
         self.conv3d_1 = nn.Conv3d (
             in_channels = in_channels, 
             out_channels = out_channels,
-            kernel_size = params.down_kernel_size,
-            stride = params.stride
+            kernel_size = params.encoder_kernel,
+            stride = params.encoder_stride,
+            padding = params.encoder_padding
         )
         
         self.conv3d_2 = nn.Conv3d (
             in_channels = out_channels, 
             out_channels = out_channels,
-            kernel_size = params.down_kernel_size,
-            stride = params.stride
+            kernel_size = params.encoder_kernel,
+            stride = params.encoder_stride,
+            padding = params.encoder_padding
         )
 
-        self.relu1 = nn.ReLU()
-        self.relu2 = nn.ReLU()
+        self.relu1 = nn.ReLU(inplace=True)
+        self.relu2 = nn.ReLU(inplace=True)
 
-        self.init_params()
+        self.reset_parameters()
 
-    def init_params(self):
+    def reset_parameters(self):
 
         self.conv3d_1.reset_parameters()
         self.conv3d_2.reset_parameters()
