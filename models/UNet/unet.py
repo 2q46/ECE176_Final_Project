@@ -54,6 +54,6 @@ class UNet(nn.Module):
         out = self.up_conv4(out, e1)
 
         out = self.final_conv(out)
-        self.softmax(out)
+        # self.softmax(out)
 
         return out

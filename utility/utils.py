@@ -35,16 +35,20 @@ def train_loop(model, train_dataloader : DataLoader, loss_fn, optimizer: optim) 
     size = len(train_dataloader)
 
     for batch, (x, y) in tqdm(enumerate(train_dataloader), desc="Training Loop"):
-        
-        print(f"On batch {batch}")
 
+        batch_loss = 0.0
+        
         pred = model(x)
         loss = loss_fn(pred, y)
+        batch_loss += loss.item()
         total_loss += loss.item()
         optimizer.zero_grad()
 
         loss.backward()
         optimizer.step()
+
+        # print(f"Batch {batch} Loss {batch_loss}")
+
     
     return total_loss/size
 
@@ -55,12 +59,16 @@ def inference_loop(model, test_dataloader : DataLoader, loss_fn):
 
     for batch, (x, y) in tqdm(enumerate(test_dataloader), desc="Evaluation Loop"):
         
-        print(f"On batch {batch}")
-
         with torch.no_grad():
+
+            batch_loss = 0.0
 
             pred = model(x)
             loss = loss_fn(pred, y)
             total_loss += loss.item()
+            batch_loss += loss.item()
+
+        # print(f"Batch {batch} Loss {batch_loss}")
+
 
     return total_loss/size
