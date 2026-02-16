@@ -28,6 +28,8 @@ class TransposedConvBlock(nn.Module):
             params=params
         )
 
+        self.groupnorm = nn.GroupNorm(8, in_channels, affine=False)
+
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -39,6 +41,6 @@ class TransposedConvBlock(nn.Module):
         
         x = self.conv3d_transposed(x)
         x = torch.cat([x, skip_connection], dim=1)
+        x = self.groupnorm(x)
         x = self.conv3d_block(x)
-        #print(x.shape)
         return x

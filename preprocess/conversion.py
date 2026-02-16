@@ -8,7 +8,7 @@ import torch.nn.functional as F
 
 from nilearn import plotting
 from typing import Optional
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 train_data_path = "data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 val_data_path = "data/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData"
@@ -46,7 +46,7 @@ def convert_all_npy(storage_location="data/BraTS2020_npy", cropping=True):
 
     print(f"{len(t1ce_paths)} datapoints found")
     
-    scaler = StandardScaler()
+    scaler = MinMaxScaler()
 
     for idx, (t1ce, t2, flair, mask) in enumerate(zip(t1ce_paths, t2_paths, flair_paths, mask_paths)):
             

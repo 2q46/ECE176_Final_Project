@@ -32,8 +32,11 @@ class ConvReLUBlock(nn.Module):
             padding = params.encoder_padding
         )
 
-        self.relu1 = nn.ReLU(inplace=True)
-        self.relu2 = nn.ReLU(inplace=True)
+        self.relu1 = nn.LeakyReLU(inplace=True)
+        self.relu2 = nn.LeakyReLU(inplace=True)
+
+        self.batch_norm1 = nn.GroupNorm(8, out_channels, affine=False)
+        self.batch_norm2 = nn.GroupNorm(8, out_channels, affine=False)
 
         self.reset_parameters()
 
@@ -45,8 +48,10 @@ class ConvReLUBlock(nn.Module):
     def forward(self, x):
 
         x = self.conv3d_1(x)
+        x = self.batch_norm1(x)
         x = self.relu1(x)
+        x = self.batch_norm2(x)
         x = self.conv3d_2(x)
         x = self.relu2(x)
-        
+
         return x

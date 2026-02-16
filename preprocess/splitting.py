@@ -1,5 +1,3 @@
-
-# use torch sampler https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.random_split
 import os
 import glob
 import torch
@@ -12,8 +10,8 @@ from utility.utils import MRI_Dataset
 def combine_from_npy(data_path: str = "data/BraTS2020_npy/data") -> tuple:
 
     '''Load the dataset from numpy into main memory'''
-    features = np.ndarray(shape=(369, 128, 128, 128, 3), dtype=np.float16)[:20]
-    labels = np.ndarray(shape=(369, 128, 128, 128, 4), dtype=np.float16)[:20]
+    features = np.ndarray(shape=(369, 128, 128, 128, 3), dtype=np.float32)[:220]
+    labels = np.ndarray(shape=(369, 128, 128, 128, 4), dtype=np.float32)[:220]
 
     for idx in range(features.shape[0]):    
 
@@ -45,8 +43,8 @@ def train_test_split(features, labels, device) -> tuple:
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     del dataset # save memory
 
-    train_dataloader = DataLoader(train_dataset, batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=6, pin_memory=True)
+    test_dataloader = DataLoader(test_dataset, batch_size, shuffle=True,  num_workers=6, pin_memory=True)
 
     print(f"Training batches: {len(train_dataloader)}")
     print(f"Testing batches: {len(test_dataloader)}")
