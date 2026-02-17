@@ -1,6 +1,5 @@
 import json
 import torch
-
 import torch.nn as nn
 from tqdm import tqdm
 import torch.optim as optim
@@ -21,6 +20,12 @@ class MRI_Dataset(Dataset):
 
         return self.in_features.shape[0]       
 
+def init_weights(model):
+
+    if isinstance(model, nn.Conv3d) or isinstance(model, nn.ConvTranspose3d):
+        nn.init.kaiming_normal_(model.weight, mode='fan_out', nonlinearity='relu')
+        if model.bias is not None:
+            nn.init.zeros_(model.bias)
 
 def train_loop(model, train_dataloader : DataLoader, loss_fn, optimizer: optim, device) -> float:
 
@@ -31,22 +36,18 @@ def train_loop(model, train_dataloader : DataLoader, loss_fn, optimizer: optim, 
 
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
-
-        optimizer.zero_grad()
         
+        optimizer.zero_grad()
+
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
             
             pred = model(x)
             loss = loss_fn(pred, y)
-
-        total_loss += loss.item()
-
-        loss.backward()
+            total_loss += loss.item()
+            loss.backward()
+        
         optimizer.step()
 
-        # print(f"Batch {batch} Loss {batch_loss}")
-
-    
     return total_loss/size
 
 def inference_loop(model, test_dataloader : DataLoader, loss_fn, device):
@@ -58,16 +59,12 @@ def inference_loop(model, test_dataloader : DataLoader, loss_fn, device):
 
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
-        
+
         with torch.no_grad():
 
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-              
                 pred = model(x)
                 loss = loss_fn(pred, y)
-            
-            total_loss += loss.item()
-
-        # print(f"Batch {batch} Loss {batch_loss}")
-        
+                total_loss += loss.item()
+                        
     return total_loss/size

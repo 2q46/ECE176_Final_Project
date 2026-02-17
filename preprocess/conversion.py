@@ -20,6 +20,12 @@ def visualise_scan_data(data_path : Optional[str], is_train : bool, title="3D Sc
     plotting.plot_img(img=root_path + data_path, title=title)
     plotting.show()
 
+def visualise_scan_abspath(data_path : Optional[str], title="3D Scan") -> None:
+
+    plotting.plot_img(img=data_path + data_path, title=title)
+    plotting.show()
+
+
 def to_one_hot(array : np.ndarray, num_classes : int) -> np.ndarray:
 
     tensor = torch.tensor(array, dtype=torch.int64)

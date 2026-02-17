@@ -10,8 +10,8 @@ from utility.utils import MRI_Dataset
 def combine_from_npy(data_path: str = "data/BraTS2020_npy/data") -> tuple:
 
     '''Load the dataset from numpy into main memory'''
-    features = np.ndarray(shape=(369, 128, 128, 128, 3), dtype=np.float32)[:220]
-    labels = np.ndarray(shape=(369, 128, 128, 128, 4), dtype=np.float32)[:220]
+    features = np.zeros(shape=(369, 128, 128, 128, 3), dtype=np.float32)[:220]
+    labels = np.zeros(shape=(369, 128, 128, 128, 4), dtype=np.float32)[:220]
 
     for idx in range(features.shape[0]):    
 
