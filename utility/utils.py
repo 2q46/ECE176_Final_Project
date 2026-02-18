@@ -27,28 +27,35 @@ def init_weights(model):
         if model.bias is not None:
             nn.init.zeros_(model.bias)
 
-def train_loop(model, train_dataloader : DataLoader, loss_fn, optimizer: optim, device) -> float:
+def train_loop(model, train_dataloader: DataLoader, loss_fn, optimizer: optim, device, accumulation_steps: int = 4) -> float:
 
     total_loss = 0.0
     size = len(train_dataloader)
+
+    optimizer.zero_grad()
 
     for batch, (x, y) in tqdm(enumerate(train_dataloader), desc="Training Loop"):
 
         x = x.to(device, non_blocking=True)
         y = y.to(device, non_blocking=True)
-        
-        optimizer.zero_grad()
 
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-            
             pred = model(x)
             loss = loss_fn(pred, y)
-            total_loss += loss.item()
+            loss = loss / accumulation_steps
+            total_loss += loss.item() * accumulation_steps
             loss.backward()
-        
-        optimizer.step()
 
-    return total_loss/size
+        if (batch + 1) % accumulation_steps == 0:
+            optimizer.step()
+            optimizer.zero_grad()
+
+    # Handle any remaining batches
+    if (batch + 1) % accumulation_steps != 0:
+        optimizer.step()
+        optimizer.zero_grad()
+
+    return total_loss / size
 
 def inference_loop(model, test_dataloader : DataLoader, loss_fn, device):
 
