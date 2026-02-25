@@ -27,7 +27,7 @@ def init_weights(model):
         if model.bias is not None:
             nn.init.zeros_(model.bias)
 
-def train_loop(model, train_dataloader: DataLoader, loss_fn, optimizer: optim, device, accumulation_steps: int = 4) -> float:
+def train_loop(model, train_dataloader: DataLoader, loss_fn, optimizer: optim, device, accumulation_steps: int = 16) -> float:
 
     total_loss = 0.0
     size = len(train_dataloader)

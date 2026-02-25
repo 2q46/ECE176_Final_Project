@@ -43,8 +43,8 @@ def train_test_split(features, labels, device) -> tuple:
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     del dataset # save memory
 
-    train_dataloader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=6, pin_memory=True)
-    test_dataloader = DataLoader(test_dataset, batch_size, shuffle=True,  num_workers=6, pin_memory=True)
+    train_dataloader = DataLoader(train_dataset, batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    test_dataloader = DataLoader(test_dataset, batch_size, shuffle=True,  num_workers=4, pin_memory=True)
 
     print(f"Training batches: {len(train_dataloader)}")
     print(f"Testing batches: {len(test_dataloader)}")
