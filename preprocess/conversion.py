@@ -9,6 +9,7 @@ import torch.nn.functional as F
 from nilearn import plotting
 from typing import Optional
 from sklearn.preprocessing import MinMaxScaler
+from utility.plotting import plot_label_and_image
 
 train_data_path = "data/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
 val_data_path = "data/BraTS2020_ValidationData/MICCAI_BraTS2020_ValidationData"
@@ -30,8 +31,10 @@ def to_one_hot(array : np.ndarray, num_classes : int) -> np.ndarray:
 
     tensor = torch.tensor(array, dtype=torch.int64)
     one_hot_tensor = F.one_hot(tensor, num_classes=num_classes)
+    one_hot_tensor = one_hot_tensor.numpy()
+    one_hot_tensor = one_hot_tensor.transpose(-1, 0, 1, 2) # classes first
 
-    return np.array(one_hot_tensor).astype(np.uint8)
+    return one_hot_tensor.astype(np.int16)
 
 def visualise_datapoint(dir_path: Optional[str], is_train : bool, title="3D Scan")-> None:
     '''
@@ -67,17 +70,15 @@ def convert_all_npy(storage_location="data/BraTS2020_npy", cropping=True):
 
         mask_img = nib.load(mask).get_fdata().astype(np.uint8)
         mask_img[mask_img==4] = 3
-
         # one-hot encoding each of the segmentation labels
 
         mask_img = to_one_hot(mask_img, 4) # 0 1 2 and 3
+        combined_img = np.stack([t1ce_img, t2_img, flair_img], axis=0)
 
-        combined_img = np.stack([t1ce_img, t2_img, flair_img], axis=3)
-        
         if cropping:
 
-            combined_img = combined_img[56:184, 56:184, 13:141]
-            mask_img = mask_img[56:184, 56:184, 13:141]
+            combined_img = combined_img[:, 56:184, 56:184, 13:141]
+            mask_img = mask_img[:, 56:184, 56:184, 13:141]
 
         out_dir = os.path.join(storage_location, "data", str(idx))
         os.makedirs(out_dir, exist_ok=True)
@@ -92,3 +93,5 @@ def convert_all_npy(storage_location="data/BraTS2020_npy", cropping=True):
         assert saved_mask.all() == mask_img.all(), "Saved mask img incorrectly"
 
     print("Saving completed.")
+
+
