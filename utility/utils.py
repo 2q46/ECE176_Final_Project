@@ -30,6 +30,8 @@ def init_weights(model):
 def train_loop(model, train_dataloader: DataLoader, loss_fn, optimizer: optim, device, accumulation_steps: int = 16) -> float:
 
     total_loss = 0.0
+    loss_fn.accum_dice_score = 0.0
+
     size = len(train_dataloader)
 
     optimizer.zero_grad()
@@ -55,11 +57,12 @@ def train_loop(model, train_dataloader: DataLoader, loss_fn, optimizer: optim, d
         optimizer.step()
         optimizer.zero_grad()
 
-    return total_loss / size
+    return total_loss / size, loss_fn.accum_dice_score / size
 
 def inference_loop(model, test_dataloader : DataLoader, loss_fn, device):
 
     total_loss = 0.0
+    loss_fn.accum_dice_score = 0.0
     size = len(test_dataloader)
 
     for batch, (x, y) in tqdm(enumerate(test_dataloader), desc="Evaluation Loop"):
@@ -74,4 +77,4 @@ def inference_loop(model, test_dataloader : DataLoader, loss_fn, device):
                 loss = loss_fn(pred, y)
                 total_loss += loss.item()
                         
-    return total_loss/size
+    return total_loss/size, loss_fn.accum_dice_score / size
