@@ -20,3 +20,13 @@ def plot_label_and_image(mask_img, combined_img: np.ndarray) -> None:
     plt.imshow(mask_img[n_slice,:,:])
     plt.title('Mask')
     plt.show()
+
+def plot_graph(y_array : np.ndarray, graph_name, x_label, y_label : str) -> None:
+
+    x_array = [i for i in range(1, len(y_array) + 1)]
+    plt.plot(x_array, y_array)
+    plt.title(graph_name)
+    plt.grid(True)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.show()
