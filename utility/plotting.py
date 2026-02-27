@@ -17,6 +17,6 @@ def plot_label_and_image(mask_img, combined_img: np.ndarray) -> None:
     plt.imshow(combined_img[2, n_slice,:,:], cmap='gray')
     plt.title('Image t2')
     plt.subplot(224)
-    plt.imshow(np.argmax(mask_img, axis=0)[n_slice,:,:])
+    plt.imshow(mask_img[n_slice,:,:])
     plt.title('Mask')
     plt.show()
