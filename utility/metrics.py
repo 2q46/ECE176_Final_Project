@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class DiceCELoss(nn.Module):
-    def __init__(self, weight=torch.tensor([1.0, 50.0, 30.0, 50.0]), smooth=1e-5, dice_weight=1.0, ce_weight=1.0):
+    def __init__(self, weight=torch.tensor([1.0, 50.0, 35.0, 45.0]), smooth=1e-5, dice_weight=1.0, ce_weight=1.0):
         super(DiceCELoss, self).__init__()
         self.smooth = smooth
         self.dice_weight = dice_weight
