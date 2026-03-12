@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 
-from blocks.conv_relu import ConvReLUBlock
-from params import UNetParams
+from models.UNet.params import UNetParams
+from models.UNet.blocks.conv_relu import ConvReLUBlock
+from models.UNet.blocks.upsample_conv_attn import ConvTransposeAttn
 
 class AttentionUNet(nn.Module):
 
@@ -19,6 +20,11 @@ class AttentionUNet(nn.Module):
 
         self.maxpool = nn.MaxPool3d(kernel_size=params.max_pool_kernel)
 
+        self.up_conv1_attn = ConvTransposeAttn(in_channels=params.decoder1_in, out_channels=params.decoder1_out, params=params)
+        self.up_conv2_attn = ConvTransposeAttn(in_channels=params.decoder2_in, out_channels=params.decoder2_out, params=params)
+        self.up_conv3_attn = ConvTransposeAttn(in_channels=params.decoder3_in, out_channels=params.decoder3_out, params=params)
+        self.up_conv4_attn = ConvTransposeAttn(in_channels=params.decoder4_in, out_channels=params.decoder4_out, params=params)
+
         self.final_conv = nn.Conv3d(
             in_channels=params.final_conv_in, 
             kernel_size=params.final_kernel,
@@ -27,5 +33,24 @@ class AttentionUNet(nn.Module):
 
     def forward(self, x):
 
+        e1 = self.down_conv1(x)
 
-        return x
+        e2 = self.maxpool(e1)
+        e2 = self.down_conv2(e2)
+
+        e3 = self.maxpool(e2)
+        e3 = self.down_conv3(e3)
+
+        e4 = self.maxpool(e3)
+        e4 = self.down_conv4(e4)
+
+        b1 = self.bottlenck(self.maxpool(e4))
+
+        out = self.up_conv1_attn(b1, e4)
+        out = self.up_conv2_attn(out, e3)
+        out = self.up_conv3_attn(out, e2)
+        out = self.up_conv4_attn(out, e1)
+
+        out = self.final_conv(out)
+
+        return out

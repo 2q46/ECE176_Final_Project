@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 
-from params import UNetParams
-from blocks.conv_relu import ConvReLUBlock
+from models.UNet.params import UNetParams
+from models.UNet.blocks.conv_relu import ConvReLUBlock
 
 class ConvTransposeAttn(nn.Module):
 
-    def __init__(self, in_channels: int, out_channels: int, params: UNetParam):
+    def __init__(self, in_channels: int, out_channels: int, params: UNetParams):
 
         super(ConvTransposeAttn, self).__init__()
 
@@ -37,7 +37,7 @@ class ConvTransposeAttn(nn.Module):
     def forward(self, x, skip_connection):
 
         x = self.conv3d_transposed(x)
-        x = self.attn_applied(x)
+        x = self.attn_applied(x, skip_connection)
         x = torch.cat([x, skip_connection], dim=1)
         x = self.groupnorm(x)
         x = self.conv3d_block(x)
@@ -78,7 +78,7 @@ class AttnModule(nn.Module):
                 out_channels=channels,
                 kernel_size=(1, 1, 1)
             ),
-            nn.Sigmoid(inplace=True)
+            nn.Sigmoid()
         )
 
         self.relu = nn.ReLU(inplace=True)
