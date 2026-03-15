@@ -19,3 +19,7 @@ using He initialization.
 # 4. trained_models
 
 In this folder contains the state dict of all the models we trained for our project.
+
+# 5. Train and Eval Notebooks
+
+In the files train.ipynb and eval.ipynb we trained the models and evaluated them
